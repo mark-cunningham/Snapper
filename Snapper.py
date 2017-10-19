@@ -29,11 +29,14 @@ GAME_LIVES = 3
 
 # Setup
 os.environ['SDL_VIDEO_CENTERED'] = '1'
+pygame.mixer.pre_init(44100, -16, 2, 512)
+pygame.mixer.init()
 pygame.init()
 game_screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Snapper')
 clock = pygame.time.Clock()
 font = pygame.font.SysFont('Arial Narrow Bold', 24)
+
 
 # Load images
 background_image = pygame.image.load('background.png').convert()
@@ -47,6 +50,10 @@ rabbit_image = pygame.image.load('rabbit.png').convert_alpha()
 owl_image = pygame.image.load('owl.png').convert_alpha()
 deer_image = pygame.image.load('deer.png').convert_alpha()
 squirrel_image = pygame.image.load('squirrel.png').convert_alpha()
+
+# Load sounds
+camera_sound = pygame.mixer.Sound('click.ogg')
+miss_sound = pygame.mixer.Sound('miss.ogg')
 
 
 def main():
@@ -201,13 +208,17 @@ def main():
                     if animal_visible is True:
                         score += animal_timer * int(animal.get('points'))
                         snap_visible = True
+                        camera_sound.play()
+
                     else:
                         miss_visible = True
                         lives -= 1
+                        miss_sound.play()
 
                 else:
                     miss_visible = True
                     lives -= 1
+                    miss_sound.play()
 
                 # Hide the animal and pause
                 animal_visible = False
@@ -271,7 +282,7 @@ def main():
         clock.tick(60)
 
 
-# Get a rendom animal from the dictionary
+# Get a random animal from the dictionary
 def get_random_animal(animals):
     random_animal = random.choice(list(animals.keys()))
     return animals.get(random_animal)
